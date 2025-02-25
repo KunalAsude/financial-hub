@@ -1,51 +1,67 @@
-"use client";
+'use client';
+import { sidebarLinks } from '@/lib/constant';
+import { cn } from '@/lib/utils';
+import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import React from 'react';
 
-import { useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Home, PieChart, CreditCard, Users, Settings, Menu } from 'lucide-react';
+const Sidebar = ({ user }) => {
+    const pathname = usePathname();
 
-const sidebarItems = [
-  { name: "Dashboard", href: "/dashboard", icon: Home },
-  { name: "Analytics", href: "/dashboard/analytics", icon: PieChart },
-  { name: "Transactions", href: "/dashboard/transactions", icon: CreditCard },
-  { name: "Accounts", href: "/dashboard/accounts", icon: Users },
-  { name: "Settings", href: "/dashboard/settings", icon: Settings },
-];
+    return (
+        <section className='sidebar'>
+            <nav className='flex flex-col gap-4'>
+                <Link
+                    href='/'
+                    className='mb-12 cursor-pointer flex items-center gap-2'>
+                    <Image
+                        src='/icons/logo2.svg'
+                        alt='logo'
+                        width={50}
+                        height={50}
+                        className='size-[50px] max-xl:size-25' />
+                    <h1 className='sidebar-logo'>
+                        Financial Hub
+                    </h1>
+                </Link>
+                {sidebarLinks.map((item) => {
+                    const isActive = pathname === item.route; // Exact match for active route
 
-export function Sidebar() {
-  const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(false);
+                    return (
+                        <Link href={item.route} key={item.label}
+                            className={cn('sidebar-link', {
+                                'bg-cyan-700': isActive // Apply the active background color
+                            })}
+                        >
+                            <div className='relative size-6'>
+                                <Image
+                                    src={item.imgURL}
+                                    alt={item.label}
+                                    fill
+                                    className={cn({ 'brightness-[3] invert-0': isActive })}
+                                />
+                            </div>
+                            <p className={cn(
+                                'sidebar-label', {
+                                    '!text-white': isActive // Change text color when active
+                                }
+                            )}>{item.label}</p>
+                        </Link>
+                    )
+                })}
+                {/* User Section (Optional) */}
+                <div className='sidebar-user'>
+                    <p>{user?.firstName || 'Guest'}</p>
+                </div>
+            </nav>
 
-  return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetTrigger asChild>
-        <Button variant="outline" size="icon" className="fixed left-4 top-4 z-40 lg:hidden">
-          <Menu className="h-6 w-6" />
-        </Button>
-      </SheetTrigger>
-      <SheetContent side="left" className="w-[300px] sm:w-[400px]">
-        <ScrollArea className="h-full py-6 pl-6 pr-6">
-          <h2 className="mb-4 text-lg font-semibold">Financial Hub</h2>
-          <div className="space-y-2">
-            {sidebarItems.map((item) => (
-              <Link key={item.href} href={item.href} onClick={() => setIsOpen(false)}>
-                <Button
-                  variant={pathname === item.href ? "secondary" : "ghost"}
-                  className="w-full justify-start"
-                >
-                  <item.icon className="mr-2 h-4 w-4" />
-                  {item.name}
-                </Button>
-              </Link>
-            ))}
-          </div>
-        </ScrollArea>
-      </SheetContent>
-    </Sheet>
-  );
-}
+            {/* Footer Section (Optional) */}
+            <footer className='sidebar-footer'>
+                Footer Content
+            </footer>
+        </section>
+    );
+};
+
+export default Sidebar;

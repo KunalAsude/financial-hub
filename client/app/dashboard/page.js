@@ -3,16 +3,18 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import { Sidebar } from "@/components/Sidebar";
-import { StatCard } from "@/components/StatCard";
-import { BarChart } from "@/components/BarChart";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, Users, CreditCard, Activity } from 'lucide-react';
+
+import HeaderBox from "@/components/HeaderBox";
+import TotalBalanceBox from "@/components/TotalBalanceBox";
+import RightSideBar from "@/components/RightSideBar";
+import Sidebar from "@/components/Sidebar";
+import MobileNavbar from "@/components/MobileNavbar";
+import Image from "next/image";
 
 const Dashboard = () => {
   const router = useRouter();
   const [user, setUser] = useState(null);
+  const loggedIn = { firstName: "Kunal", lastName: "Asude", email: "Kunal@gmail.com" };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -32,45 +34,49 @@ const Dashboard = () => {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen">
-        <Sidebar />
-        <div className="p-4 sm:ml-4 lg:ml-0">
-          <header className="mb-6 mt-16 lg:mt-0">
-            <h1 className="text-3xl font-semibold text-gray-900">Dashboard</h1>
-          </header>
-          <main>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <StatCard title="Total Revenue" value="$45,231.89" icon={<DollarSign className="h-4 w-4 text-muted-foreground" />} />
-              <StatCard title="Active Users" value="2,345" icon={<Users className="h-4 w-4 text-muted-foreground" />} />
-              <StatCard title="New Accounts" value="+12.5%" icon={<CreditCard className="h-4 w-4 text-muted-foreground" />} />
-              <StatCard title="Transactions" value="1,234" icon={<Activity className="h-4 w-4 text-muted-foreground" />} />
-            </div>
-            <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-              <Card className="col-span-4 bg-blue-500">
-                <CardHeader>
-                  <CardTitle>Monthly Revenue</CardTitle>
-                </CardHeader>
-                <CardContent className="pl-2">
-                  <BarChart />
-                </CardContent>
-              </Card>
-              <Card className="col-span-3">
-                <CardHeader>
-                  <CardTitle>Recent Transactions</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {/* Add a table or list of recent transactions here */}
-                </CardContent>
-              </Card>
-            </div>
-            <div className="mt-6 flex justify-end">
-              <Button onClick={handleLogout} variant="destructive">
-                Logout
-              </Button>
-            </div>
-          </main>
+      {/* Mobile Navigation Section */}
+      <div className="root-layout md:hidden">
+        <Image
+          src="/icons/logo2.svg"
+          alt="logo"
+          width={40}
+          height={40}
+        />
+        <div>
+          <MobileNavbar user={loggedIn} />
         </div>
       </div>
+
+      {/* Main Dashboard Layout */}
+      <section className="home flex">
+        {/* Sidebar (Visible on larger screens) */}
+        <Sidebar user={loggedIn} />
+
+        {/* Main Content */}
+        <div className="home-content flex-1">
+          <header className="home-header">
+            <HeaderBox
+              type="greeting"
+              title="Welcome"
+              user={loggedIn?.firstName || "Guest"}
+              subtext="Secure and reliable banking system for seamless financial management and transactions. Experience advanced security, efficient processing, and trustworthy financial solutions."
+            />
+            <TotalBalanceBox
+              accounts={[]}
+              totalCurrentBalance={12500.45}
+              totalBanks={1}
+            />
+          </header>
+          Recent Transactions
+        </div>
+
+        {/* Right Sidebar */}
+        <RightSideBar
+          user={loggedIn}
+          transactions={[]}
+          banks={[{ currentBalance: 1000 }, { currentBalance: 2000 }]}
+        />
+      </section>
     </ProtectedRoute>
   );
 };

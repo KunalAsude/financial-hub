@@ -57,5 +57,9 @@ export default {
   		}
   	}
   },
+  fontFamily: {
+	'ibm-plex-serif': ['IBM Plex Serif', 'serif'],
+	// Add other custom fonts here
+  },
   plugins: [require("tailwindcss-animate")],
 };
