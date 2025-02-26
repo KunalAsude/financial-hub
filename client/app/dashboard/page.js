@@ -10,6 +10,8 @@ import RightSideBar from "@/components/RightSideBar";
 import Sidebar from "@/components/Sidebar";
 import MobileNavbar from "@/components/MobileNavbar";
 import Image from "next/image";
+import { Root } from "postcss";
+import RootLayout from "@/components/RootLayout";
 
 const Dashboard = () => {
   const router = useRouter();
@@ -33,24 +35,14 @@ const Dashboard = () => {
   };
 
   return (
+    <RootLayout>
     <ProtectedRoute>
-      {/* Mobile Navigation Section */}
-      <div className="root-layout md:hidden">
-        <Image
-          src="/icons/logo2.svg"
-          alt="logo"
-          width={40}
-          height={40}
-        />
-        <div>
-          <MobileNavbar user={loggedIn} />
-        </div>
-      </div>
+      
 
       {/* Main Dashboard Layout */}
       <section className="home flex">
         {/* Sidebar (Visible on larger screens) */}
-        <Sidebar user={loggedIn} />
+        
 
         {/* Main Content */}
         <div className="home-content flex-1">
@@ -78,6 +70,7 @@ const Dashboard = () => {
         />
       </section>
     </ProtectedRoute>
+    </RootLayout>
   );
 };
 

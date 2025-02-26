@@ -1,71 +1,211 @@
-"use client";
+"use client"
 
-import React from "react";
-import Link from "next/link";
-import Image from "next/image";
-import BankCard from "@/components/BankCard"; // Assuming you have a BankCard component
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
+import { CheckCircle2, Clock, Plus } from "lucide-react"
+import RootLayout from "@/components/RootLayout"
+import ProtectedRoute from "@/components/ProtectedRoute"
 
-const MyBanks = ({ user, banks }) => {
+const mockBanks = [
+  {
+    id: "1",
+    profileName: "Default",
+    bankName: "My Bank 1",
+    status: "verified",
+    details: {
+      accountName: "John Doe",
+      accountNumber: "1234567890",
+      swiftCode: "MYBKUS33",
+      accountAddress: "123 Main St, New York, NY 10001",
+      bankAddress: "456 Bank St, New York, NY 10002",
+    },
+  },
+  {
+    id: "2",
+    profileName: "My personal bank 1",
+    bankName: "My Bank 1",
+    status: "submitted",
+  },
+  {
+    id: "3",
+    profileName: "My personal Bank*",
+    bankName: "My Bank 1",
+    status: "submitted",
+  },
+]
+
+export default function MyBanksPage() {
+  const [banks, setBanks] = useState(mockBanks)
+  const [isAddingBank, setIsAddingBank] = useState(false)
+
+  const handleAddBank = (e) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+
+    const newBank = {
+      id: Date.now().toString(),
+      profileName: formData.get("name"),
+      bankName: formData.get("bankName"),
+      status: "submitted",
+      details: {
+        accountName: formData.get("accountName"),
+        accountNumber: formData.get("accountNumber"),
+        swiftCode: formData.get("swiftCode"),
+        accountAddress: formData.get("accountAddress"),
+        bankAddress: formData.get("bankAddress"),
+      },
+    }
+
+    setBanks([...banks, newBank])
+    setIsAddingBank(false)
+  }
+
   return (
-    <div className="my-banks">
-      <div className="header flex items-center justify-between">
-        <h2 className="header-2">My Banks</h2>
-        <Link href="/add-bank" className="flex gap-2 items-center">
-          <Image
-            src="/icons/plus.svg"
-            alt="Add Bank"
-            width={20}
-            height={20}
-          />
-          <h2 className="text-14 font-semibold text-gray-600">Add Bank</h2>
-        </Link>
-      </div>
-
-      {banks?.length > 0 ? (
-        <div className="relative flex flex-col items-center justify-center gap-5">
-          {/* Display the first bank account */}
-          <div className="relative z-10 w-full">
-            <BankCard
-              key={banks[0].$id}
-              account={banks[0]}
-              userName={`${user.firstName} ${user.lastName}`}
-              showBalance={true}
-            />
+    <RootLayout>
+      <ProtectedRoute>
+        <div className="container mx-auto py-8 px-4">
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-2xl font-semibold text-gray-900">My Banks</h1>
+            <Dialog open={isAddingBank} onOpenChange={setIsAddingBank}>
+              <DialogTrigger asChild>
+                <Button className="bg-teal-500 text-white hover:bg-teal-600">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add New Bank
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[600px] bg-gray-50">
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-semibold">Add New Bank</DialogTitle>
+                  <DialogDescription className="text-gray-600">
+                    Enter your bank account details below
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleAddBank} className="space-y-6 py-4">
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="name" className="text-gray-700">Name*</Label>
+                      <Input id="name" name="name" placeholder="Name of this account" className="mt-1.5 bg-white" required />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="accountName" className="text-gray-700">Account Name*</Label>
+                        <Input id="accountName" name="accountName" placeholder="Account Name" className="mt-1.5 bg-white" required />
+                      </div>
+                      <div>
+                        <Label htmlFor="accountNumber" className="text-gray-700">Account Number*</Label>
+                        <Input
+                          id="accountNumber"
+                          name="accountNumber"
+                          placeholder="Account Number"
+                          className="mt-1.5 bg-white"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="bankName" className="text-gray-700">Bank Name*</Label>
+                        <Input id="bankName" name="bankName" placeholder="Bank Name" className="mt-1.5 bg-white" required />
+                      </div>
+                      <div>
+                        <Label htmlFor="swiftCode" className="text-gray-700">Swift Code*</Label>
+                        <Input id="swiftCode" name="swiftCode" placeholder="Swift Code" className="mt-1.5 bg-white" required />
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="accountAddress" className="text-gray-700">Account Address*</Label>
+                      <Input
+                        id="accountAddress"
+                        name="accountAddress"
+                        placeholder="Enter the physical address on that bank account"
+                        className="mt-1.5 bg-white"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="bankAddress" className="text-gray-700">Bank Address*</Label>
+                      <Input id="bankAddress" name="bankAddress" placeholder="Bank Address" className="mt-1.5 bg-white" required />
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-4">
+                    <Button type="button" variant="outline" onClick={() => setIsAddingBank(false)}>
+                      Cancel
+                    </Button>
+                    <Button type="submit" className="bg-teal-500 hover:bg-teal-600">
+                      Add Bank
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
 
-          {/* Display the second bank account (if it exists) */}
-          {banks[1] && (
-            <div className="absolute right-0 top-8 z-0 w-[90%]">
-              <BankCard
-                key={banks[1].$id}
-                account={banks[1]}
-                userName={`${user.firstName} ${user.lastName}`}
-                showBalance={true}
-              />
-            </div>
-          )}
+          <div className="space-y-6">
+            {banks.map((bank) => (
+              <Card key={bank.id} className=" w-full items-center  gap-4 rounded-xl border-0 border-gray-200 p-4 sm:gap-6 sm:p-6 ">
+                <CardHeader className="flex flex-row justify-between items-start pb-4 w-full">
+                  <div>
+                    <CardTitle className="text-xl">{bank.profileName}</CardTitle>
+                    <CardDescription>{bank.bankName}</CardDescription>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {bank.status === "verified" ? (
+                      <>
+                        <CheckCircle2 className="h-5 w-5 text-teal-500" />
+                        <span className="text-teal-500">Verified</span>
+                      </>
+                    ) : (
+                      <>
+                        <Clock className="h-5 w-5 text-yellow-500" />
+                        <span className="text-yellow-500">Submitted</span>
+                      </>
+                    )}
+                  </div>
+                </CardHeader>
+                {bank.details && (
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-gray-700">Account Name</Label>
+                        <p className="mt-1 text-sm text-gray-900">{bank.details.accountName}</p>
+                      </div>
+                      <div>
+                        <Label className="text-gray-700">Account Number</Label>
+                        <p className="mt-1 text-sm text-gray-900">{bank.details.accountNumber}</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-gray-700">Swift Code</Label>
+                        <p className="mt-1 text-sm text-gray-900">{bank.details.swiftCode}</p>
+                      </div>
+                      <div>
+                        <Label className="text-gray-700">Account Address</Label>
+                        <p className="mt-1 text-sm text-gray-900">{bank.details.accountAddress}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <Label className="text-gray-700">Bank Address</Label>
+                      <p className="mt-1 text-sm text-gray-900">{bank.details.bankAddress}</p>
+                    </div>
+                  </CardContent>
+                )}
+              </Card>
+            ))}
+          </div>
         </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center gap-4">
-          <Image
-            src="/icons/bank.svg"
-            alt="No Banks"
-            width={100}
-            height={100}
-          />
-          <p className="text-16 font-semibold text-gray-600">
-            You have no bank accounts linked.
-          </p>
-          <Link
-            href="/add-bank"
-            className="text-14 font-semibold text-blue-600 hover:text-blue-700"
-          >
-            Add a Bank Account
-          </Link>
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default MyBanks;
+      </ProtectedRoute>
+    </RootLayout>
+  )
+}
