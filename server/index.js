@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(cors());
 app.use(helmet());
 
-// Routes
+// Routes for auth bank and transactions
 import authRoutes from "./routes/authRoutes.js";
 import bankRoutes from "./routes/bankRoutes.js";
 import transactionRoutes from "./routes/transactionRoutes.js";
